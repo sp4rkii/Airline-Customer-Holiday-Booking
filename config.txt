@@ -1,3 +1,3 @@
-URI=neo4j+s://7a555ec7.databases.neo4j.io
+URI=neo4j://127.0.0.1:7687
 USERNAME=neo4j
-PASSWORD=DK9ymwKY-4Jz8nSsBxjVZ-x3KsBQmoPL7mpZMysKt18
+PASSWORD=your_password
