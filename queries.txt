@@ -1,0 +1,49 @@
+// 1. Query 1 — Top 5 Routes with the Highest Number of Flights
+
+MATCH (f:Flight)-[:DEPARTS_FROM]->(o:Airport),
+      (f)-[:ARRIVES_AT]->(d:Airport)
+RETURN o.station_code AS origin,
+       d.station_code AS destination,
+       count(f) AS flight_count
+ORDER BY flight_count DESC
+LIMIT 5;
+
+
+// 2. Query 2 — Top 10 Flights with the Most Passenger Feedback
+
+MATCH (j:Journey)-[:ON]->(f:Flight)
+RETURN f.flight_number AS flight_number,
+       f.fleet_type_description AS fleet_type,
+       count(j) AS passenger_feedback_count
+ORDER BY passenger_feedback_count DESC
+LIMIT 10;
+
+
+// 3. Query 3 — Avg Food Satisfaction for Multi-Leg Journeys Grouped by Generation
+
+MATCH (p:Passenger)-[:TOOK]->(j:Journey)
+WHERE j.number_of_legs > 1
+WITH p.generation AS generation,
+     count(j) AS multi_leg_count,
+     avg(j.food_satisfaction_score) AS avg_score
+RETURN generation, multi_leg_count, avg_score
+ORDER BY multi_leg_count DESC;
+
+
+// 4. Query 4 — Flights with the Shortest Average Arrival Delay
+
+MATCH (j:Journey)-[:ON]->(f:Flight)
+WITH f.flight_number AS flight_id,
+     avg(j.arrival_delay_minutes) AS avg_arrival_delay
+RETURN flight_id, avg_arrival_delay
+ORDER BY avg_arrival_delay ASC
+LIMIT 10;
+
+
+// 5. Query 5 — Average Flown Miles per Loyalty Program Level
+
+MATCH (p:Passenger)-[:TOOK]->(j:Journey)
+WITH p.loyalty_program_level AS loyalty_level,
+     avg(j.actual_flown_miles) AS avg_actual_flown_miles
+RETURN loyalty_level, avg_actual_flown_miles
+ORDER BY avg_actual_flown_miles DESC;

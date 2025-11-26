@@ -1,0 +1,30 @@
+Rule for Scoring Multi-Leg Journeys:
+
+In this knowledge graph, a multi-leg journey is defined as any Journey node where
+the property `number_of_legs` is greater than 1.
+
+To compute the generation-based multi-leg food satisfaction score, the rule is:
+
+1. Identify all Journey nodes where:
+       j.number_of_legs > 1
+
+2. For each such journey, identify the Passenger who took it:
+       (p:Passenger)-[:TOOK]->(j:Journey)
+
+3. Group these multi-leg journeys by the passenger’s generation:
+       p.generation
+
+4. For each generation group, compute:
+       - multi_leg_count = total number of multi-leg journeys
+       - avg_score = average of j.food_satisfaction_score
+
+This rule is implemented in the following Cypher pattern:
+
+MATCH (p:Passenger)-[:TOOK]->(j:Journey)
+WHERE j.number_of_legs > 1
+WITH p.generation AS generation,
+     count(j) AS multi_leg_count,
+     avg(j.food_satisfaction_score) AS avg_score
+RETURN generation, multi_leg_count, avg_score
+ORDER BY multi_leg_count DESC;
+
