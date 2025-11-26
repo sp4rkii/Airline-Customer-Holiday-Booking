@@ -88,9 +88,9 @@ def run_verification_queries(driver):
     # ---------- QUERY 2 ----------
     q2 = """
     MATCH (j:Journey)-[:ON]->(f:Flight)
-    RETURN f.flight_number AS flight_number,
-           f.fleet_type_description AS fleet_type,
-           count(j) AS passenger_feedback_count
+    WITH f.flight_number AS flight_number,
+        count(j) AS passenger_feedback_count
+    RETURN flight_number, passenger_feedback_count
     ORDER BY passenger_feedback_count DESC
     LIMIT 10;
     """
@@ -134,7 +134,7 @@ def run_verification_queries(driver):
         # Query 2
         print("\nQuery 2 — Top 10 Flights by Passenger Feedback:\n")
         for r in session.run(q2):
-            print(f"  Flight {r['flight_number']} ({r['fleet_type']}) | feedbacks: {r['passenger_feedback_count']}")
+            print(f"  Flight {r['flight_number']} | feedbacks: {r['passenger_feedback_count']}")
 
         # Query 3
         print("\nQuery 3 — Avg Food Satisfaction for Multi-Leg Journeys:\n")

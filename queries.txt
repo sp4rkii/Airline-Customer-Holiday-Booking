@@ -12,9 +12,9 @@ LIMIT 5;
 // 2. Query 2 — Top 10 Flights with the Most Passenger Feedback
 
 MATCH (j:Journey)-[:ON]->(f:Flight)
-RETURN f.flight_number AS flight_number,
-       f.fleet_type_description AS fleet_type,
-       count(j) AS passenger_feedback_count
+WITH f.flight_number AS flight_number,
+    count(j) AS passenger_feedback_count
+RETURN flight_number, passenger_feedback_count
 ORDER BY passenger_feedback_count DESC
 LIMIT 10;
 
