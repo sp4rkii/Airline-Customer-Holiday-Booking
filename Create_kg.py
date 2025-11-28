@@ -284,7 +284,7 @@ def main():
         load_data(driver, CSV_FILE)
         print_statistics(driver)
         run_verification_queries(driver)
-        run_interactive_queries(driver)
+        #run_interactive_queries(driver)
     finally:
         driver.close()
 

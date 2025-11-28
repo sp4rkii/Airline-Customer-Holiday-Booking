@@ -1,30 +1,83 @@
-Rule for Scoring Multi-Leg Journeys:
+================================================================================
+RULE SPECIFICATION: OVERALL PASSENGER SATISFACTION SCORE
+================================================================================
 
-In this knowledge graph, a multi-leg journey is defined as any Journey node where
-the property `number_of_legs` is greater than 1.
+1. OBJECTIVE
+   Identify the number of passengers with an Overall Satisfaction Score strictly 
+   greater than 3.
 
-To compute the generation-based multi-leg food satisfaction score, the rule is:
+2. MASTER FORMULA
+   Overall Score = (0.50 * Food_Score) + 
+                   (0.35 * Delay_Score) + 
+                   (0.10 * Legs_Score) + 
+                   (0.05 * Miles_Score)
 
-1. Identify all Journey nodes where:
-       j.number_of_legs > 1
+3. COMPONENT CALCULATIONS
 
-2. For each such journey, identify the Passenger who took it:
-       (p:Passenger)-[:TOOK]->(j:Journey)
+   A. Food Score (Weight: 50%)
+      - Source: Journey.food_satisfaction_score
+      - Logic: Direct value (Range 1-5).
 
-3. Group these multi-leg journeys by the passenger’s generation:
-       p.generation
+   B. Delay Score (Weight: 35%)
+      - Source: Journey.arrival_delay_minutes
+      - Formula: 5 - CLAMP(ROUND(ABS(arrival_delay_minutes) / 20, 1), 0, 5)
+      - Logic: 
+        1. Take absolute value of arrival delay.
+        2. Divide by 20.
+        3. Round to 1 decimal place.
+        4. Clamp result between 0 and 5 (this is the penalty).
+        5. Subtract penalty from 5.
 
-4. For each generation group, compute:
-       - multi_leg_count = total number of multi-leg journeys
-       - avg_score = average of j.food_satisfaction_score
+   C. Legs Score (Weight: 10%)
+      - Source: Journey.number_of_legs
+      - Formula: 5 - CLAMP(ROUND(number_of_legs * 1.5, 1), 0, 5)
+      - Logic:
+        1. Multiply number of legs by 1.5.
+        2. Round to 1 decimal place.
+        3. Clamp result between 0 and 5 (this is the penalty).
+        4. Subtract penalty from 5.
 
-This rule is implemented in the following Cypher pattern:
+   D. Miles Score (Weight: 5%)
+      - Source: Journey.actual_flown_miles
+      - Formula: 5 - CLAMP(ROUND(actual_flown_miles / 3000, 1), 0, 5)
+      - Logic:
+        1. Divide flown miles by 3000.
+        2. Round to 1 decimal place.
+        3. Clamp result between 0 and 5 (this is the penalty).
+        4. Subtract penalty from 5.
+
+================================================================================
+CYPHER QUERY IMPLEMENTATION
+================================================================================
 
 MATCH (p:Passenger)-[:TOOK]->(j:Journey)
-WHERE j.number_of_legs > 1
-WITH p.generation AS generation,
-     count(j) AS multi_leg_count,
-     avg(j.food_satisfaction_score) AS avg_score
-RETURN generation, multi_leg_count, avg_score
-ORDER BY multi_leg_count DESC;
 
+// Step 1: Calculate raw penalties (Rounded to 1 decimal)
+WITH p, j,
+     round(abs(j.arrival_delay_minutes) / 20.0, 1) AS raw_delay_penalty,
+     round(j.number_of_legs * 1.5, 1) AS raw_legs_penalty,
+     round(j.actual_flown_miles / 3000.0, 1) AS raw_miles_penalty
+
+// Step 2: Apply Clamping (Max penalty is 5) and Inversion (5 - penalty)
+// Logic: If penalty > 5, cap it at 5. Then subtract from 5 to get the score.
+WITH p,
+     j.food_satisfaction_score AS food_score,
+     5 - (CASE WHEN raw_delay_penalty > 5 THEN 5 ELSE raw_delay_penalty END) AS delay_score,
+     5 - (CASE WHEN raw_legs_penalty > 5 THEN 5 ELSE raw_legs_penalty END) AS legs_score,
+     5 - (CASE WHEN raw_miles_penalty > 5 THEN 5 ELSE raw_miles_penalty END) AS miles_score
+
+// Step 3: Weighted Average
+WITH p,
+     (0.50 * food_score) +
+     (0.35 * delay_score) +
+     (0.10 * legs_score) +
+     (0.05 * miles_score) AS overall_satisfaction_score
+
+// Step 4: Filter and Count
+WHERE overall_satisfaction_score > 3
+RETURN count(p) AS qualified_passengers;
+
+================================================================================
+ANSWER
+================================================================================
+1925
