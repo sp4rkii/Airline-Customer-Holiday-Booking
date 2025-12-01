@@ -125,6 +125,36 @@ def run_verification_queries(driver):
     ORDER BY avg_actual_flown_miles DESC;
     """
 
+    #---------- Satisfaction rule from rule.txt ----------
+    q6="""
+    MATCH (p:Passenger)-[:TOOK]->(j:Journey)
+
+// Step 1: Calculate raw penalties (Rounded to 1 decimal)
+WITH p, j,
+     round(abs(j.arrival_delay_minutes) / 20.0, 1) AS raw_delay_penalty,
+     round(j.number_of_legs * 1.5, 1) AS raw_legs_penalty,
+     round(j.actual_flown_miles / 3000.0, 1) AS raw_miles_penalty
+
+// Step 2: Apply Clamping (Max penalty is 5) and Inversion (5 - penalty)
+// Logic: If penalty > 5, cap it at 5. Then subtract from 5 to get the score.
+WITH p,
+     j.food_satisfaction_score AS food_score,
+     5 - (CASE WHEN raw_delay_penalty > 5 THEN 5 ELSE raw_delay_penalty END) AS delay_score,
+     5 - (CASE WHEN raw_legs_penalty > 5 THEN 5 ELSE raw_legs_penalty END) AS legs_score,
+     5 - (CASE WHEN raw_miles_penalty > 5 THEN 5 ELSE raw_miles_penalty END) AS miles_score
+
+// Step 3: Weighted Average
+WITH p,
+     (0.50 * food_score) +
+     (0.35 * delay_score) +
+     (0.10 * legs_score) +
+     (0.05 * miles_score) AS overall_satisfaction_score
+
+// Step 4: Filter and Count
+WHERE overall_satisfaction_score > 3
+RETURN count(p) AS qualified_passengers;
+    """
+
     with driver.session() as session:
         # Query 1
         print("Query 1 — Top 5 Routes by Number of Flights:\n")
@@ -150,6 +180,11 @@ def run_verification_queries(driver):
         print("\nQuery 5 — Avg Flown Miles by Loyalty Level:\n")
         for r in session.run(q5):
             print(f"  {r['loyalty_level']} | avg miles: {r['avg_actual_flown_miles']}")
+
+        #Satisfaction Rule Query
+        print("\nPassengers with Overall Satisfaction Score > 3:\n")
+        for r in session.run(q6):
+            print(f"Actual Count: {r['qualified_passengers']}")
 
     print("\nVerification queries complete.\n")
 
