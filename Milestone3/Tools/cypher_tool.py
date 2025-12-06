@@ -1,15 +1,17 @@
 import os
+from dotenv import load_dotenv
 from typing import Optional, Literal
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from .database import Neo4jConnection
 
+# Load environment variables from .env file immediately
+load_dotenv()
+
 # 1. SETUP: Configure your Gemini API Key
-# Best practice: Set this in your environment variables, but you can hardcode for testing
 if "GOOGLE_API_KEY" not in os.environ:
-    # Placeholder - User needs to set this
-    os.environ["GOOGLE_API_KEY"] = "AIzaSyAU5wlCt4RYwNfAq_6_OE-qV9Jo3VpZGdk"
+    print("Warning: GOOGLE_API_KEY not found in environment. Please ensure it is set in your .env file.")
 
 # Initialize the Gemini Model (Flash is faster/cheaper for this task)
 llm = ChatGoogleGenerativeAI(

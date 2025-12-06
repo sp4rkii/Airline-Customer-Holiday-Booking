@@ -3,6 +3,7 @@ import google.generativeai as genai
 from typing import TypedDict, List, Any, Optional, Literal
 from langgraph.graph import StateGraph, START, END
 from dotenv import load_dotenv
+from langchain_core.messages import HumanMessage
 
 # --- IMPORT CUSTOM TOOLS ---
 # These imports rely on the files being in the same directory
@@ -10,15 +11,10 @@ from Tools.database import Neo4jConnection
 from Tools.cypher_tool import classification_chain, extraction_chain, generate_cypher_query
 from Tools.prompt_engineer_tool import optimize_query
 from Tools.rag_tool import search_knowledge_base
+from Tools.llm_factory import get_llm
 
 # Setup Gemini for the final synthesizer
 load_dotenv()
-if "GOOGLE_API_KEY" not in os.environ:
-    print("Warning: GOOGLE_API_KEY not found in env.")
-
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-# Using stable 2.5-flash for synthesis
-model = genai.GenerativeModel('gemini-2.5-flash')
 
 # ---------------------------------------------------------
 # 1. DEFINE HYBRID STATE
@@ -26,7 +22,8 @@ model = genai.GenerativeModel('gemini-2.5-flash')
 class HybridState(TypedDict):
     # Input
     user_query: str
-    retrieval_mode: Literal["baseline", "embeddings", "hybrid"] 
+    retrieval_mode: Literal["baseline", "embeddings", "hybrid"]
+    selected_model: str 
     
     # Shared NLU (Intent & Entities)
     intent: str
@@ -129,7 +126,7 @@ def synthesizer_node(state: HybridState):
             unstructured_data = "No text context found."
 
     # Master Prompt
-    prompt = f"""
+    prompt_text = f"""
     You are an advanced Airline Operations Assistant.
     Answer the user's question based on the active retrieval methods.
     
@@ -152,8 +149,22 @@ def synthesizer_node(state: HybridState):
     """
 
     try:
-        response = model.generate_content(prompt)
-        answer = response.text.strip()
+        model_name = state.get("selected_model", "Gemini Flash")
+        print(f"   [Synthesis] Using Model: {model_name}")
+        
+        llm = get_llm(model_name)
+        
+        # Invoke LLM (LangChain interface)
+        # Wrap prompt in HumanMessage for Chat Models
+        messages = [HumanMessage(content=prompt_text)]
+        response = llm.invoke(messages)
+        
+        # Handle different return types
+        if hasattr(response, "content"):
+            answer = response.content.strip()
+        else:
+            answer = str(response).strip()
+            
     except Exception as e:
         answer = f"Error during synthesis: {e}"
 
@@ -221,28 +232,53 @@ if __name__ == "__main__":
     
     while True:
         print("\n-------------------------------------------")
-        print("Select Retrieval Mode:")
-        print("1. Baseline (Cypher Only)")
-        print("2. Embeddings (Vector Only)")
-        print("3. Hybrid (Both)")
+        print("1. Select Retrieval Mode")
+        print("2. Select LLM Model")
+        print("3. Run Query")
+        print("q. Quit")
         
-        mode_choice = input("Enter choice (1-3) or 'q' to quit: ")
-        if mode_choice.lower() == 'q': break
+        # Default settings if not changed
+        if 'current_mode' not in locals(): current_mode = "hybrid"
+        if 'current_model' not in locals(): current_model = "Gemini Flash"
         
-        mode_map = {"1": "baseline", "2": "embeddings", "3": "hybrid"}
-        selected_mode = mode_map.get(mode_choice, "hybrid")
+        print(f"\nCurrent Settings: Mode=[{current_mode}], Model=[{current_model}]")
         
-        q = input(f"Enter query ({selected_mode.upper()}): ")
-        if q.lower() == 'q': break
+        choice = input("Enter choice: ")
         
-        inputs = {
-            "user_query": q,
-            "retrieval_mode": selected_mode
-        }
-        
-        try:
-            result = app.invoke(inputs)
-            print("\n>> FINAL ANSWER:")
-            print(result["final_answer"])
-        except Exception as e:
-            print(f"\n[Error] Agent execution failed: {e}")
+        if choice == '1':
+            print("\nRetrieval Modes:")
+            print("1. Baseline (Cypher Only)")
+            print("2. Embeddings (Vector Only)")
+            print("3. Hybrid (Both)")
+            m = input("Choice (1-3): ")
+            mode_map = {"1": "baseline", "2": "embeddings", "3": "hybrid"}
+            current_mode = mode_map.get(m, "hybrid")
+            
+        elif choice == '2':
+            print("\nLLM Models:")
+            print("1. Gemini Flash")
+            print("2. Mistral-7B")
+            print("3. Zephyr-7B")
+            m = input("Choice (1-3): ")
+            model_map = {"1": "Gemini Flash", "2": "Mistral-7B", "3": "Zephyr-7B"}
+            current_model = model_map.get(m, "Gemini Flash")
+            
+        elif choice == '3':
+            q = input(f"Enter query: ")
+            if q.lower() == 'q': break
+            
+            inputs = {
+                "user_query": q,
+                "retrieval_mode": current_mode,
+                "selected_model": current_model
+            }
+            
+            try:
+                result = app.invoke(inputs)
+                print("\n>> FINAL ANSWER:")
+                print(result["final_answer"])
+            except Exception as e:
+                print(f"\n[Error] Agent execution failed: {e}")
+                
+        elif choice.lower() == 'q':
+            break

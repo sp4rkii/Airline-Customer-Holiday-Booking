@@ -8,6 +8,7 @@ numpy
 google-generativeai
 python-dotenv
 langchain_google_genai
+langchain-huggingface
 
 # 3. Agent Orchestration
 langgraph
