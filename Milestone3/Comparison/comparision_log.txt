@@ -1,0 +1,130 @@
+Fetching data from Neo4j...
+Fetched 3132 records.
+
+--- Processing Model: sentence-transformers/all-MiniLM-L6-v2 ---
+Encoding...
+Vector Dimensions: 384
+Saved index to airline_db_mini.index
+
+--- Processing Model: sentence-transformers/all-mpnet-base-v2 ---
+Encoding...
+Vector Dimensions: 768
+Saved index to airline_db_mpnet.index
+
+DONE! Ready for comparison.
+Loading Model A (MiniLM)...
+Loading Model B (MPNet)...
+
+=== EMBEDDING MODEL SHOWDOWN ===
+Model A: all-MiniLM-L6-v2 (Fast, 384 dim)
+Model B: all-mpnet-base-v2 (Precise, 768 dim)
+
+Enter test query (or 'q'): Which passengers experienced long arrival delays?
+
+QUERY: 'Which passengers experienced long arrival delays?'
+------------------------------------------------------------
+MODEL A (MiniLM) FOUND:
+Passenger A3XX6X (Gen X, non-elite status) booked Economy class on Flight 4763 (operated by ERJ-175). The journey from BOX to ORX covered 1437 miles. Feedback: The food was terrible and poor (rated 3/10). The flight was significantly delayed by 135 minutes.
+------------------------------------------------------------
+MODEL B (MPNet) FOUND:
+Passenger H8XX2X (Gen X, non-elite status) booked Economy class on Flight 3 (operated by B787-9). The journey from SIX to SFX covered 8440 miles. Feedback: The food was average (rated 4/10). The flight was significantly delayed by 42 minutes.
+============================================================
+
+Enter test query (or 'q'): Show passengers who complained about the food quality.
+
+QUERY: 'Show passengers who complained about the food quality.'
+------------------------------------------------------------
+MODEL A (MiniLM) FOUND:
+Passenger H1XX20 (Millennial, non-elite status) booked Economy class on Flight 1427 (operated by B737-800). The journey from IAX to MIX covered 717 miles. Feedback: The food was terrible and poor (rated 3/10). The flight was slightly delayed by 10 minutes.
+------------------------------------------------------------
+MODEL B (MPNet) FOUND:
+Passenger I7XXBX (Millennial, non-elite status) booked Economy class on Flight 1155 (operated by B737-900). The journey from IAX to CUX covered 1354 miles. Feedback: The food was terrible and poor (rated 1/10). The flight was on time.
+============================================================
+
+Enter test query (or 'q'): Find business-class travelers on any long-haul flights.
+
+QUERY: 'Find business-class travelers on any long-haul flights.'
+------------------------------------------------------------
+MODEL A (MiniLM) FOUND:
+Passenger B9XX70 (Boomer, global services status) booked Economy class on Flight 51 (operated by B767-400). The journey from MAX to EWX covered 3607 miles. Feedback: The food was terrible and poor (rated 1/10). The flight was on time.
+------------------------------------------------------------
+MODEL B (MPNet) FOUND:
+Passenger OJXXY3 (Millennial, non-elite status) booked Economy class on Flight 365 (operated by B737-800). The journey from CLX to DEX covered 1201 miles. Feedback: The food was average (rated 4/10). The flight was on time.
+============================================================
+
+Enter test query (or 'q'): Which passengers flew from IAX TO MIX?    
+
+QUERY: 'Which passengers flew from IAX TO MIX?'
+------------------------------------------------------------
+MODEL A (MiniLM) FOUND:
+Passenger N8XXSC (Millennial, non-elite status) booked Economy class on Flight 1947 (operated by B767-400). The journey from IAX to IAX covered 1190 miles. Feedback: The food was terrible and poor (rated 3/10). The flight was on time.
+------------------------------------------------------------
+MODEL B (MPNet) FOUND:
+Passenger IYXX66 (Gen X, premier 1k status) booked Economy class on Flight 2141 (operated by B737-900). The journey from MIX to IAX covered 964 miles. Feedback: The food was average (rated 5/10). The flight was slightly delayed by 1 minutes.
+============================================================
+
+Enter test query (or 'q'): List passengers with Gold loyalty status.
+
+QUERY: 'List passengers with Gold loyalty status.'
+------------------------------------------------------------
+MODEL A (MiniLM) FOUND:
+Passenger K4XXL3 (Millennial, premier gold status) booked Economy class on Flight 691 (operated by B737-MAX8). The journey from DEX to SEX covered 1024 miles. Feedback: The food was terrible and poor (rated 3/10). The flight was on time.
+------------------------------------------------------------
+MODEL B (MPNet) FOUND:
+Passenger H4XXMP (Gen X, premier gold status) booked Economy class on Flight 946 (operated by B787-10). The journey from FRX to ORX covered 4344 miles. Feedback: The food was average (rated 4/10). The flight was on time.
+============================================================
+
+Enter test query (or 'q'): Who had a pleasant overall experience?
+
+QUERY: 'Who had a pleasant overall experience?'
+------------------------------------------------------------
+MODEL A (MiniLM) FOUND:
+Passenger N0XX4X (Millennial, non-elite status) booked Economy class on Flight 4392 (operated by CRJ-550). The journey from CVX to ORX covered 264 miles. Feedback: The food was terrible and poor (rated 3/10). The flight was on time.
+------------------------------------------------------------
+MODEL B (MPNet) FOUND:
+Passenger LMXXC4 (Millennial, premier silver status) booked Economy class on Flight 327 (operated by B737-900). The journey from SEX to SEX covered 2306 miles. Feedback: The food was terrible and poor (rated 1/10). The flight was on time.
+============================================================
+
+Enter test query (or 'q'): Passengers traveling on aircraft from the Boeing fleet.
+
+QUERY: 'Passengers traveling on aircraft from the Boeing fleet.'
+------------------------------------------------------------
+MODEL A (MiniLM) FOUND:
+Passenger NCXX2J (Silent, non-elite status) booked Economy class on Flight 1497 (operated by B737-MAX8). The journey from FLX to EWX covered 1065 miles. Feedback: The food was terrible and poor (rated 2/10). The flight was on time.
+------------------------------------------------------------
+MODEL B (MPNet) FOUND:
+Passenger BFXXCM (Millennial, non-elite status) booked Economy class on Flight 723 (operated by B737-MAX9). The journey from ORX to FLX covered 1182 miles. Feedback: The food was average (rated 5/10). The flight was on time.
+============================================================
+
+Enter test query (or 'q'): Find trips with multiple legs or connections.
+
+QUERY: 'Find trips with multiple legs or connections.'
+------------------------------------------------------------
+MODEL A (MiniLM) FOUND:
+Passenger B0XXE8 (Boomer, non-elite status) booked Economy class on Flight 1777 (operated by A320-200). The journey from PIX to ORX covered 412 miles. Feedback: The food was average (rated 4/10). The flight was on time.
+------------------------------------------------------------
+MODEL B (MPNet) FOUND:
+Passenger OKXXLH (Millennial, non-elite status) booked Economy class on Flight 1852 (operated by B737-900). The journey from ORX to PDX covered 1739 miles. Feedback: The food was average (rated 5/10). The flight was on time.
+============================================================
+
+Enter test query (or 'q'): Show me passengers with very bad experiences.
+
+QUERY: 'Show me passengers with very bad experiences.'
+------------------------------------------------------------
+MODEL A (MiniLM) FOUND:
+Passenger IMXXHG (Boomer, non-elite status) booked Economy class on Flight 1609 (operated by B737-MAX9). The journey from SEX to ORX covered 1721 miles. Feedback: The food was terrible and poor (rated 3/10). The flight was on time.
+------------------------------------------------------------
+MODEL B (MPNet) FOUND:
+Passenger NEXXPZ (Millennial, non-elite status) booked Economy class on Flight 1023 (operated by B737-900). The journey from DEX to PIX covered 1290 miles. Feedback: The food was terrible and poor (rated 2/10). The flight was on time.
+============================================================
+
+Enter test query (or 'q'): Which passengers booked economy class but flew long distances?
+
+QUERY: 'Which passengers booked economy class but flew long distances?'
+------------------------------------------------------------
+MODEL A (MiniLM) FOUND:
+Passenger F6XX47 (Millennial, non-elite status) booked Economy class on Flight 1631 (operated by B737-900). The journey from SEX to DEX covered 1024 miles. Feedback: The food was terrible and poor (rated 1/10). The flight was on time.
+------------------------------------------------------------
+MODEL B (MPNet) FOUND:
+Passenger E2XXS8 (Boomer, non-elite status) booked Economy class on Flight 5 (operated by B787-9). The journey from LHX to IAX covered 4834 miles. Feedback: The food was average (rated 5/10). The flight was on time.
+============================================================

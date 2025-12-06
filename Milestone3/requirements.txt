@@ -1,0 +1,19 @@
+# 1. Database & Embeddings
+neo4j
+sentence-transformers
+faiss-cpu
+numpy
+
+# 2. LLM & API Access
+google-generativeai
+python-dotenv
+langchain_google_genai
+
+# 3. Agent Orchestration
+langgraph
+langchain
+langchain-community
+
+# 4. Utilities 
+pypdf
+huggingface-hub
