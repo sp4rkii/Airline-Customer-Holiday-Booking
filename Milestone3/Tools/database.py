@@ -1,7 +1,12 @@
 import os
 from neo4j import GraphDatabase
 
-def load_config(file_path="../config.txt"):
+# Calculate the absolute path to config.txt
+# Assumes database.py is in Milestone3/Tools/ and config.txt is in the project root
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CONFIG_PATH = os.path.join(BASE_DIR, "config.txt")
+
+def load_config(file_path=CONFIG_PATH):
     config = {}
     try:
         with open(file_path, "r") as f:
@@ -12,7 +17,7 @@ def load_config(file_path="../config.txt"):
         return config
     except FileNotFoundError:
         print(f"Error: {file_path} not found.")
-        return None
+        return {}
     
 config = load_config()
 URI = config.get("uri")

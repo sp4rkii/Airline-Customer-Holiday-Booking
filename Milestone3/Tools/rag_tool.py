@@ -1,16 +1,24 @@
 import faiss
 import pickle
 import numpy as np
+import os
 from sentence_transformers import SentenceTransformer
 
 # 1. Load Artifacts (Executes once when this file is imported)
 print("   [Tool] Loading RAG Knowledge Base...")
 try:
+    # Calculate paths relative to this script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    
+    index_path = os.path.join(parent_dir, "airline_db.index")
+    texts_path = os.path.join(parent_dir, "airline_texts.pkl")
+
     # Load Index
-    index = faiss.read_index("airline_db.index")
+    index = faiss.read_index(index_path)
     
     # Load Text Chunks
-    with open("airline_texts.pkl", "rb") as f:
+    with open(texts_path, "rb") as f:
         feature_texts = pickle.load(f)
         
     # Load Model (Must be same as vector_embedding.py)
