@@ -15,7 +15,7 @@ if "GOOGLE_API_KEY" not in os.environ:
 
 # Initialize the Gemini Model (Flash is faster/cheaper for this task)
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model="gemini-2.5-flash-lite",
     temperature=0.0  # Keep it 0 for deterministic results
 )
 

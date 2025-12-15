@@ -33,7 +33,7 @@ except Exception as e:
     feature_texts = []
     embedder = None
 
-def search_knowledge_base(query: str, k: int = 3):
+def search_knowledge_base(query: str, k: int = 5):
     """
     Embeds the query and searches the FAISS index.
     Returns a list of the top k text chunks.

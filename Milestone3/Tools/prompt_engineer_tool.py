@@ -9,7 +9,7 @@ if not api_key:
     raise ValueError("Error: GOOGLE_API_KEY not found in environment.")
 
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-2.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash-Lite')
 
 def optimize_query(user_input: str) -> str:
     """
